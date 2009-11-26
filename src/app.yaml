@@ -1,0 +1,13 @@
+application: makorekan
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /.*
+  script: main.py
+- url: /_ah/mail/.+
+  script: main.py
+  login: admin  
+inbound_services:
+- mail
