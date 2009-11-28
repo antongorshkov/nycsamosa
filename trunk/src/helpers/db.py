@@ -10,6 +10,7 @@ from geopy import Point
 from helpers import logger
 from models import Event
     
+#TODO: MOVE THESE to common constant files!
 GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
 YAHOO_KEY = 'u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB'
  
@@ -22,7 +23,6 @@ def query(search):
     try:
         place, (lat, lng) = g.geocode(search)
     except ValueError:    
-        logger.LogIt("Google errored, lets try yahoo")
         place, (lat, lng) = y.geocode(search)
         
     lng_min = lng - range
