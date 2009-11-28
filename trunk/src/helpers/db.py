@@ -10,11 +10,21 @@ from geopy import Point
 from helpers import logger
 from models import Event
     
+GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
+YAHOO_KEY = 'u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB'
+ 
 def query(search):
     mile = 0.01502 #bad bad approximation - need to calculate more precise
     range = mile*0.1 #by default 5 mile 'radius', in future need to give option
-    g = geocoders.Google('ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA')  
-    place, (lat, lng) = g.geocode(search)
+    g = geocoders.Google(GOOGLE_KEY)
+    y = geocoders.Yahoo(YAHOO_KEY) 
+
+    try:
+        place, (lat, lng) = g.geocode(search)
+    except ValueError:    
+        logger.LogIt("Google errored, lets try yahoo")
+        place, (lat, lng) = y.geocode(search)
+        
     lng_min = lng - range
     lng_max = lng + range
     lat_min = lat - range
