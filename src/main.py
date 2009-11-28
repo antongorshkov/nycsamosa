@@ -11,8 +11,15 @@ from helpers import logger
 from helpers import parser
 from helpers import db
 from geopy import geocoders
-#from urllib import urlencode
 from urllib2 import urlopen
+
+#TODO: MOVE THESE to common constant files!
+GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
+YAHOO_KEY = 'u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB'
+
+#TODO: CODE REPEAT on the Static Map stuff.  Should be a single library that takes an array of markers?
+#TODO: The Try Google if doesn't work, do Yahoo functionality needs to be encapsulated somewhere 
+#(at least implement in the mail Handler
 
 class MailHandler(InboundMailHandler):
     def receive(self, mail_message):
@@ -34,8 +41,8 @@ class MailHandler(InboundMailHandler):
         #txtQuery = parser.ParseIt(txtmsg)
         txtQuery = str(txtmsg)        
         results = db.query(txtQuery)
+        #REMOVE FROM HERE! DRY!!!!!        
         i=1
-        #REMOVE FROM HERE! DRY!!!!!
         api_key = "ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA"
         g = geocoders.Google(api_key)  
         place, (lat, lng) = g.geocode(txtQuery)    
@@ -72,11 +79,27 @@ class WebSMS(webapp.RequestHandler):
         self.out("""<body style="background-image:url(http://www.google.com/sms/images/bigphone.jpg); background-repeat:no-repeat"> <div id=cellphoneDiv style="margin: 93px 0px 0px 37px; height: 218px; width: 164px; overflow: auto;"> <div id=inbox align=center style="font-family: arial; font-size: 80%;"><br></div><div id=messageBox style="font-family: arial; font-size: 80%; font-weight: bold; white-space: -moz-pre-wrap; word-wrap: break-word;">""")
         txtQuery = parser.ParseIt(cgi.escape(self.request.get('sms')))        
         results = db.query(txtQuery)
-        i=1
+        #REMOVE FROM HERE! DRY!!!!!        
+        i=1         
+        g = geocoders.Google(GOOGLE_KEY)
+        y = geocoders.Yahoo(YAHOO_KEY) 
+
+        try:
+            place, (lat, lng) = g.geocode(txtQuery)
+        except ValueError:    
+            place, (lat, lng) = y.geocode(txtQuery)
+              
+        markers = "&markers=color:red|label:You|"+str(lat)+","+str(lng)        
         for res in results:
             self.out("(" + str(i) + ") " + res.eventName + ": " + res.eventDescription + " @ " + res.location + "(" + str(res.distance) + " miles)<br>")
+            markers = markers + "&markers=color:blue|label:"+str(i)+"|"+str(res.latitude)+","+str(res.longtitude)            
             i=i+1
-        self.out("</div></div></body></html>")        
+        url="http://maps.google.com/maps/api/staticmap?center="+str(lat)+","+str(lng)
+        url=url+"&zoom=14&size=512x512&maptype=roadmap&sensor=false"+markers+"&key="+GOOGLE_KEY
+        
+        self.out("</div></div><br><br><br><p><img border=\"0\" src=\"")
+        self.out(url)
+        self.out("\"/></p></body></html>")        
                 
     def out(self, txt):
         self.response.out.write(txt)
