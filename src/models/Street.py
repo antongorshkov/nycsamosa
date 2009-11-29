@@ -6,6 +6,6 @@ Created on Nov 29, 2009
 from google.appengine.ext import db
 
 class Street(db.Model):
-    streetName = db.StringProperty()    
+    street = db.StringProperty()    
     zip = db.IntegerProperty()
     borough = db.StringProperty()
