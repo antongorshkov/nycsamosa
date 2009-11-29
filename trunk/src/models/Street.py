@@ -7,5 +7,5 @@ from google.appengine.ext import db
 
 class Street(db.Model):
     street = db.StringProperty()    
-    zip = db.IntegerProperty()
+    zipcodes = db.IntegerProperty()
     borough = db.StringProperty()
