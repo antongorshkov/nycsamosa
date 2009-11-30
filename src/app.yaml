@@ -14,3 +14,9 @@ handlers:
   login: admin  
 inbound_services:
 - mail
+
+indexes:
+- kind: Street
+	properties:
+	- name: borough
+	- name: zipcode
