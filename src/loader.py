@@ -22,7 +22,7 @@ class StreetLoader(bulkloader.Loader):
     def __init__(self):
         bulkloader.Loader.__init__(self, 'Street',
                                    [('street', str),
-                                    ('zipcodes', int),
+                                    ('zipcode', int),
                                     ('borough', str)
                                    ])
 
