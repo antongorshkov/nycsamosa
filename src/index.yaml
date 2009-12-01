@@ -1,5 +1,0 @@
-indexes:
-- kind: Street
-	properties:
-	- name: borough
-	- name: zipcode
