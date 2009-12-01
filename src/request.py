@@ -11,6 +11,7 @@ from helpers import logger
 from google.appengine.ext import db
 from google.appengine.api import mail
 from urllib2 import urlopen
+from models import Event
 
 GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
 YAHOO_KEY = 'u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB'
