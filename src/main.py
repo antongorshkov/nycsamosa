@@ -1,17 +1,11 @@
-#A simple comment to test SVN commits
-
 import cgi
-import email
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
-from google.appengine.api import mail
 from helpers import logger
 from helpers import parser
-from helpers import db
-from geopy import geocoders
-from urllib2 import urlopen
+import request
 
 #TODO: MOVE THESE to common constant files!
 GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
@@ -24,8 +18,7 @@ YAHOO_KEY = 'u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB'
 class MailHandler(InboundMailHandler):
     def receive(self, mail_message):
         logger.LogIt("Received a message from: " + mail_message.sender)
-        logger.LogIt("Subject: " + mail_message.subject)
-        
+        logger.LogIt("Subject: " + mail_message.subject)        
         plaintext = mail_message.bodies(content_type='text/plain')
         for text in plaintext:
             txtmsg = ""
@@ -34,34 +27,9 @@ class MailHandler(InboundMailHandler):
         logger.LogIt("Body is %s" % txtmsg)
         logger.LogIt("Length of body is: " + str(len(txtmsg)))        
         
-        sender = "daveou@gmail.com"        
-        subject = "Re: " + mail_message.subject
-#        message.body = "Got your message" + txtmsg
-        body = "Results:\n"
-        #txtQuery = parser.ParseIt(txtmsg)
-        txtQuery = str(txtmsg)        
-        results = db.query(txtQuery)
-        #REMOVE FROM HERE! DRY!!!!!        
-        i=1
-        api_key = "ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA"
-        g = geocoders.Google(api_key)  
-        place, (lat, lng) = g.geocode(txtQuery)    
-        markers = "&markers=color:red|label:You|"+str(lat)+","+str(lng)
-        for res in results:
-            body = body + "(" + str(i) + ") " + res.eventName + ": " + res.eventDescription + " @ " + res.location
-            markers = markers + "&markers=color:blue|label:"+str(i)+"|"+str(res.latitude)+","+str(res.longtitude) 
-            i=i+1
-        url="http://maps.google.com/maps/api/staticmap?center="+str(lat)+","+str(lng)
-        url=url+"&zoom=14&size=512x512&maptype=roadmap&sensor=false"+markers+"&key="+api_key
-        logger.LogIt("URL is: " + url)
-        filehandle = urlopen(url)              
-        mail.send_mail(sender=sender,
-                       to=mail_message.sender,
-                       subject=subject,
-                       body=body,
-                       attachments=[("pic.png", filehandle.read())]
-                       )
-         
+        req = request.Request(txtmsg,mail_message.sender)
+        req.execute()
+        req.sendMail(mail_message.subject)
         
 class MainPage(webapp.RequestHandler):
     def get(self):
@@ -69,53 +37,34 @@ class MainPage(webapp.RequestHandler):
         self.response.out.write("""
           <html><body>
               <form action="/websms" method="post">
-              <input type="text" value="" name="sms" id="searchTerm" size="45" ><input type="submit" value="Send SMS to Samosa!">
+              <input type="text" value="" name="sms" id="searchTerm" size="45" ><input type="submit" value="Send SMS to Samosa4!">
               </form></body></html>""")
 
 
 class WebSMS(webapp.RequestHandler):
     def post(self):
         logger.LogIt("WebSMS post called" )
-        self.out("""<body style="background-image:url(http://www.google.com/sms/images/bigphone.jpg); background-repeat:no-repeat"> <div id=cellphoneDiv style="margin: 93px 0px 0px 37px; height: 218px; width: 164px; overflow: auto;"> <div id=inbox align=center style="font-family: arial; font-size: 80%;"><br></div><div id=messageBox style="font-family: arial; font-size: 80%; font-weight: bold; white-space: -moz-pre-wrap; word-wrap: break-word;">""")
-        txtQuery = parser.ParseIt(cgi.escape(self.request.get('sms')))        
-        results = db.query(txtQuery)
-        #REMOVE FROM HERE! DRY!!!!!        
-        i=1         
-        g = geocoders.Google(GOOGLE_KEY)
-        y = geocoders.Yahoo(YAHOO_KEY) 
-
-        try:
-            place, (lat, lng) = g.geocode(txtQuery)
-        except ValueError:    
-            place, (lat, lng) = y.geocode(txtQuery)
-              
-        markers = "&markers=color:red|label:You|"+str(lat)+","+str(lng)        
-        for res in results:
-            self.out("(" + str(i) + ") " + res.eventName + ": " + res.eventDescription + " @ " + res.location + "(" + str(res.distance) + " miles)<br>")
-            markers = markers + "&markers=color:blue|label:"+str(i)+"|"+str(res.latitude)+","+str(res.longtitude)            
-            i=i+1
-        url="http://maps.google.com/maps/api/staticmap?center="+str(lat)+","+str(lng)
-        url=url+"&zoom=14&size=512x512&maptype=roadmap&sensor=false"+markers+"&key="+GOOGLE_KEY
-        
-        self.out("</div></div><br><br><br><p><img border=\"0\" src=\"")
-        self.out(url)
-        self.out("\"/></p></body></html>")        
-                
-    def out(self, txt):
-        self.response.out.write(txt)
+        txtQuery = parser.ParseIt(cgi.escape(self.request.get('sms')))
+        req = request.Request(txtQuery)
+        req.execute()
+        self.response.out.write( req.showWeb() )
         
 class QuickClass(webapp.RequestHandler):
     def get(self):
-        self.response.out.write("Hello There2!<br>")
-        logger.LogIt("Q get called" )
-        url = "http://maps.google.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=14&size=512x512&maptype=roadmap\&markers=color:blue|label:S|40.702147,-74.015794&markers=color:green|label:G|40.711614,-74.012318&markers=color:red|label:C|40.718217,-73.998284&sensor=false&key=ABQIAAAAzr2EBOXUKnm_jVnk0OJI7xSsTL4WIgxhMZ0ZK_kHjwHeQuOD4xQJpBVbSrqNn69S6DOTv203MQ5ufA"
-        filehandle = urlopen(url)              
-        mail.send_mail(sender="daveou@gmail.com",
-                       to="6467338252@mms.att.net",
-                       subject="Test Sending Google Image",
-                       body=";)",
-                       attachments=[("pic.png", filehandle.read())]
-                       )
+        self.response.out.write("Hello There5!<br>")
+        #z = array.array('L')
+        #f = open('./FASTLEXICON_3.MDF','rb')
+        #print f
+        #z.fromfile(f,125000)
+        #print len(z)        
+        #print z
+
+#        q = MontyLingua.MontyLingua()
+#        sentence = 'Show me events near 54th and 5th ave'
+#        q.pp_info(q.jist(sentence))        
+#        text = nltk.word_tokenize("pothole on 54th St and Lexington Ave?")
+#        text_tagged = nltk.pos_tag(text)
+#        print text_tagged
             
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
