@@ -11,7 +11,9 @@ from helpers import logger
 from google.appengine.ext import db
 from google.appengine.api import mail
 from urllib2 import urlopen
-from models import Event
+from models import Event #@UnusedImport Google needs it!
+
+
 
 GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
 YAHOO_KEY = 'u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB'
@@ -33,6 +35,7 @@ class Request(object):
         self.parseIt()
         self.geoTagIt()
         self.sender = sender
+        self.results_index = 0
                 
     def show(self):
         print(self.user_input)
@@ -40,6 +43,10 @@ class Request(object):
         print(self.place)
         print(self.lat, self.lng)
     
+    def getData(self):
+        data = self.user_input + "\n" + self.query_type + "\n" + str(self.place) + str(self.lat) + "\n" +  str(self.lng)
+        return(data)
+       
     def parseIt(self):
         #TODO Parsing logic to extract everything (address, type of query, etc)
         self.address = self.user_input
@@ -71,6 +78,7 @@ class Request(object):
         self.LogIt("lat_min: " + str(lat_min))
         self.LogIt("lat_min: " + str(lat_max))
         
+        #TODO: Probably best to query by date alone and then just store all results since we're outputing them 5 at a time
         #    Can't query by two parameters, so only querying on one and then doing distance calculation
         #    This is not good.  Need GeoHash based algorithm instead.
         query = db.GqlQuery("SELECT * FROM Event WHERE longtitude > :lomin AND longtitude < :lomax", 
@@ -110,11 +118,11 @@ class Request(object):
     def sendMail(self, subject):        
         subject = "Re: " + subject
         body = "Results:\n"
-        results = self.SearchResults[0:5]
-        i=1
+        #TODO: Need to handle cases when requested typeslice is bigger then results!
+        results = self.SearchResults[self.results_index:self.results_index+5]
         for res in results:
-            body = body + "(" + str(i) + ") " + res.eventName + ": " + res.eventDescription + " @ " + res.location 
-            i=i+1
+            body = body + "(" + str(self.results_index) + ") " + res.eventName + ": " + res.eventDescription + " @ " + res.location
+            self.results_index += 1
         url = self.GetGoogleMapURL(results)                
         logger.LogIt("URL is: " + url)
         filehandle = urlopen(url)              
