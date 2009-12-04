@@ -81,5 +81,15 @@ class SidewalkCafeLoader(bulkloader.Loader):
                                     ('latitude',float),
                                     ('longitude',float)])
 
-loaders = [EventLoader,StreetLoader,ParkingLoader,AltParkingLoader,LaundromatLoader,SidewalkCafeLoader]
 
+class WifiSpotLoader(bulkloader.Loader):
+    def __init__(self):
+        bulkloader.Loader.__init__(self, 'WifiSpot',
+                                   [('name',str),
+                                   ('address',str),
+                                   ('latitude',float),
+                                   ('longitude',float)
+                                   ])
+
+
+loaders = [EventLoader,StreetLoader,ParkingLoader,AltParkingLoader,LaundromatLoader,SidewalkCafeLoader,WifiSpotLoader]
