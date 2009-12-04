@@ -34,7 +34,7 @@ class MailHandler(InboundMailHandler):
         if req is not None and More_RegEx.search(txtmsg) is not None:
             req.sendMail(mail_message.subject)            
         else:
-            req = request.Request(txtmsg,mail_message.sender)
+            req = request.RequestHandler(txtmsg,mail_message.sender)
             req.execute()
             req.sendMail(mail_message.subject)
     
@@ -56,7 +56,7 @@ class WebSMS(webapp.RequestHandler):
     def post(self):
         logger.LogIt("WebSMS post called" )
         txtQuery = parser.ParseIt(cgi.escape(self.request.get('sms')))
-        req = request.Request(txtQuery)
+        req = request.RequestHandler(txtQuery)
         req.execute()
         self.response.out.write( req.showWeb() )
         m = memcache.Client()
