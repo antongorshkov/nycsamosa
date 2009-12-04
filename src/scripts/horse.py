@@ -83,7 +83,27 @@ class locator:
 # 
  
     
-
+#
+#def loc(street,city,state,zipc):
+#    engine, date = 1, ""  #1 = Google, 2 = Yahoo
+#    if(engine == 1):
+#        conn = httplib.HTTPConnection("maps.google.com")
+#        apiKey = "ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA"
+#        param = "/maps/geo?q="+street+",+"+city+",+"+state+",+"+zipc+"&output=json&sensor=false&key="+apiKey
+#        conn.request("GET", param)
+#    if(engine == 2):
+#        conn = httplib.HTTPConnection("local.yahooapis.com")
+#        param = "/MapsService/V1/geocode?appid=u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB"
+#        conn.request("POST", param+"&street="+street+"&city="+city+"&state="+state)
+#    response = conn.getresponse()
+#    print response.status, response.reason
+#    if(response.reason == 'OK'):
+#        data = response.read()
+#        print data
+#        coords = extractCoordinates(data)
+#        print coords
+#    conn.close()
+#    return coords
 
     
     
