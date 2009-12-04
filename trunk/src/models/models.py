@@ -89,4 +89,16 @@ class SidewalkCafe(db.Model):
         return self.name + "@" + self.address
     
     def long(self):
-        return "longitude"    
+        return "longitude"
+
+class WifiSpot(db.Model):
+    address = db.StringProperty()
+    latitude = db.FloatProperty()
+    longitude = db.FloatProperty()
+    name = db.StringProperty()
+    
+    def description(self):
+        return self.name + "@" + self.address
+    
+    def long(self):
+        return "longitude"
