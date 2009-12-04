@@ -13,6 +13,7 @@ from google.appengine.api import mail
 from urllib2 import urlopen
 from models.models import * #@UnusedWildImport google wants it!
 import re
+from datetime import date
 
 GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
 YAHOO_KEY = 'u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB'
@@ -24,6 +25,8 @@ You can get info about all of city services and more. Use the following conventi
 cafes@union square, new york
 events @ 85 Broadway
 laundry @ 10004
+You can also search for Wifi, Parking
+'altpark' for alternate parking rules
 You can also search for wifi, parking.  You can ask for Alternate Parking rules!  
 """
 
@@ -62,11 +65,11 @@ class RequestHandler(object):
         #Rules will be applied in order(i think?), first rule wins!
         Rules = {
                  re.compile('event|happenings', re.I): LocateRequest("Event"),
-                 re.compile('laundromat|laundramat|laundry|cleaners', re.I): LocateRequest("Laundromat"),
+                 re.compile('laund|cleaners', re.I): LocateRequest("Laundromat"),
+                 re.compile('alternate|altpark', re.I): AltParking("AltParking"),                 
                  re.compile('parking|park', re.I): LocateRequest("Parking"),
                  re.compile('cafe|restaurant', re.I): LocateRequest("SidewalkCafe"),
                  re.compile('wifi|wireless|internet', re.I): LocateRequest("WifiSpot"),                 
-                 re.compile('alternate|altpark', re.I): InfoRequest("AltParking"),
                  re.compile('\?|help', re.I): HelpRequest("HELP"),
                  }        
         #We assume having @ means there is an address
@@ -101,12 +104,10 @@ class RequestHandler(object):
         #TODO: Need to handle cases when requested typeslice is bigger then results!
         attachment = self.Request.getAttachment()
         body = self.Request.MailResults()        
-        mail.send_mail(sender=EMAIL_SENDER,
-                       to=self.sender,
-                       subject=subject,
-                       body=body,
-                       attachments=attachment
-                       )    
+        if len(attachment):
+            mail.send_mail(sender=EMAIL_SENDER,to=self.sender,subject=subject,body=body,attachments=attachment)
+        else:
+            mail.send_mail(sender=EMAIL_SENDER,to=self.sender,subject=subject,body=body)
         
     def LogIt(self, msg):
         logger.LogIt(msg)
@@ -243,15 +244,33 @@ class LocateRequest(GenericRequest):
         attachment = [("pic.png", filehandle.read())]
         return attachment         
 
-class InfoRequest(GenericRequest):
+class AltParking(GenericRequest):
     '''
     InfoRequest - handles requests to get some information
     '''
+    def execute(self):
+        query = db.GqlQuery("SELECT * FROM AltParking WHERE date >= :today ORDER BY date ASC", today=date.today() )
+        
+        self.LogIt(str(query))
+        ret_results = []
+        for result in query:
+            ret_results.append( result )        
+        self.SearchResults = ret_results[0:100]
+
+    def WebResults(self, line_break="<br>"):
+        body = "Upcoming Alternate Parking Holidays:\n"
+        results = self.SearchResults[self.results_index:self.results_index+5]
+        for res in results:
+            body = body + "(" + str(self.results_index+1) + ") " + res.date.strftime("%m/%d/%y") + " - " + res.reason + line_break
+            self.results_index += 1
+        return body            
+    
+    def MailResults(self):
+        return self.WebResults("\n")
 
 class HelpRequest(GenericRequest):
     '''
     HelpRequest - handles requests for Help
     '''
     def WebResults(self):
-        return "I see you've come here for help.  Well you're in the right place!"
-        
+        return HELP_STRING
