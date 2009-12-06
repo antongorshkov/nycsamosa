@@ -347,10 +347,11 @@ class Google(WebGeocoder):
             places = []
         else:
             places = doc.getElementsByTagName('Placemark')
-
-        if exactly_one and len(places) != 1:
-            raise ValueError("Didn't find exactly one placemark! " \
-                             "(Found %d.)" % len(places))
+    
+        #If we found more than one, lets just return the first and not throw.
+        #if exactly_one and len(places) != 1:
+        #    raise ValueError("Didn't find exactly one placemark! " \
+        #                     "(Found %d.)" % len(places))
         
         def parse_place(place):
             location = self._get_first_text(place, ['address', 'name']) or None
