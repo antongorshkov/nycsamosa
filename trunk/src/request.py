@@ -3,6 +3,7 @@ Created on Nov 30, 2009
 
 @author: Anton Gorshkov
 '''
+import sys
 
 from geopy import geocoders
 from geopy import distance
@@ -13,9 +14,13 @@ from google.appengine.api import mail
 from urllib2 import urlopen
 from models.models import * #@UnusedWildImport google wants it!
 import re
-from datetime import date
+from datetime import date, datetime
 
-GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
+#Previous Key:
+#GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
+
+#Anton got this one:
+GOOGLE_KEY = 'ABQIAAAAtaHRQFa02xlz0i3fu8ySPxSH7FXBwHSUoWsCAYRfqtoxAWqychQGBY8Apv9gr2X3FlFUW82d0SluZg'
 YAHOO_KEY = 'u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB'
 MILE = 0.01502 #bad bad approximation - need to calculate more precise
 RANGE = MILE*0.1 #by default 5 mile 'radius', in future need to give option
@@ -29,23 +34,24 @@ You can also search for Wifi, Parking
 'altpark' for alternate parking rules
 You can also search for wifi, parking.  You can ask for Alternate Parking rules!  
 """
+CONFUSION = "I'm sorry, I didn't understand you.  Please try again or reply 'HELP' for more info."
 
 class RequestHandler(object):
     '''
     RequestHandler - handles every request
     '''
 
-    def __init__(self, input, sender = None ):
+    def __init__(self, input, sender = None, attachment = None ):
         '''
         Constructor
         '''
         logger.LogIt(input)        
         self.user_input = input
         self.address = ""
-        self.Request = GenericRequest("UNKNOWN")
-        self.parseIt()
-        self.Request.geoTagIt()
         self.sender = sender
+        self.Request = GenericRequest("UNKNOWN")
+        self.attachment = attachment
+        self.parseIt()
         self.logSelf()
                 
     def show(self):
@@ -64,26 +70,45 @@ class RequestHandler(object):
     def parseIt(self):       
         #Rules will be applied in order(i think?), first rule wins!
         Rules = {
-                 re.compile('event|happenings', re.I): LocateRequest("Event"),
-                 re.compile('laund|cleaners', re.I): LocateRequest("Laundromat"),
-                 re.compile('alternate|altpark', re.I): AltParking("AltParking"),                 
-                 re.compile('parking|park', re.I): LocateRequest("Parking"),
-                 re.compile('cafe|restaurant', re.I): LocateRequest("SidewalkCafe"),
-                 re.compile('wifi|wireless|internet', re.I): LocateRequest("WifiSpot"),                 
-                 re.compile('\?|help', re.I): HelpRequest("HELP"),
+                 #RegEx to match agains                [ ClassName        Type     ]
+                 #Misc.
+                 re.compile('alternate|altpark', re.I):     [ "AltParking", "AltParking"],
+                 #Location Based
+                 re.compile('event|happenings', re.I):      [ "LocateRequest", "Event" ],
+                 re.compile('laund|cleaners', re.I):        [ "LocateRequest", "Laundromat"],                 
+                 re.compile('parking|park', re.I):          [ "LocateRequest","Parking"],
+                 re.compile('cafe|restaurant', re.I):       [ "LocateRequest", "SidewalkCafe"],
+                 re.compile('wifi|wireless|internet', re.I):[ "LocateRequest", "WifiSpot"],                 
+
+                 #Feedback Requests
+                 re.compile("tree", re.I):                  [ "FeedbackRequest", "DAMAGED_TREE" ],
+                 re.compile("sign", re.I):                  [ "FeedbackRequest", "STREET_SIGN" ],
+                 re.compile("light", re.I):                 [ "FeedbackRequest", "STREET_LIGHT" ],
+                 re.compile("lot", re.I):                   [ "FeedbackRequest", "VACANT_LOT" ],
+                 re.compile("street", re.I):                [ "FeedbackRequest", "STREET_CONDITION" ],
+                 re.compile("taxi", re.I):                  [ "FeedbackRequest", "TAXI_LOST" ],
+                 re.compile("graf", re.I):                  [ "FeedbackRequest", "BUILD_GRAFFITI" ],
+                                  
+                 #Help
+                 re.compile('\?|help', re.I):               [ "HelpRequest", "HELP" ],
                  }        
+        query = self.user_input
+        address = ""
         #We assume having @ means there is an address
         if "@" in self.user_input:        
-            ( self.query, self.address ) = self.user_input.split("@",1)   
-        else:            
-            self.query = self.user_input
+            ( query, address ) = self.user_input.split("@",1)
             
         for RegEx, Request in Rules.iteritems():                   
-            if RegEx.search(self.query) is not None:
-                self.Request = Request
-                self.Request.address = self.address
-                self.Request.query = self.query 
-                break                               #First Rule Wins!            
+            if RegEx.search(query) is not None:
+                try:
+                    self.LogIt("Trying to instantiate " + Request[0])
+                    self.Request = globals()[Request[0]](Request[1], query, address, self.sender, self.attachment)
+                except:
+                    self.LogIt("Failed, going for UNKNOWN" + str(sys.exc_info()[0]))
+                    self.Request = GenericRequest("UNKNOWN")
+                    if Request[0] == "LocateRequest" and address == "":
+                        self.Request.AdditionalInfo = "missing location"
+                break    #First Rule Wins!            
        
     def execute(self):
         '''
@@ -101,7 +126,6 @@ class RequestHandler(object):
 
     def sendMail(self, subject):        
         subject = "Re: " + subject       
-        #TODO: Need to handle cases when requested typeslice is bigger then results!
         attachment = self.Request.getAttachment()
         body = self.Request.MailResults()        
         if len(attachment):
@@ -117,19 +141,33 @@ class GenericRequest(object):
     GenericRequest - base request object.
     '''
 
-    def __init__(self, type):
+    def __init__(self, type, query="", address="", sender="", attachment=None):
         '''
         Constructor
         '''
-        self.address = ""
+        self.AdditionalInfo = ""
+        self.LogIt("Started Constructor...")
+        self.IsGeoTagged = False
+        self.attachment = attachment
+        self.address = address
+        self.sender = sender
+        self.query = query
         self.results_index = 0
         self.type = type
+        self.geoTagIt()
+        if self.validate() is not True:
+            self.LogIt("Failed validation!?!?!")
+            raise "Failed to Validate!"
         
     def LogIt(self, msg):
         logger.LogIt(msg)
         
     def getData(self):
-        return self.address + "\n" 
+        return self.address + "\n"
+    
+    def validate(self):
+        self.LogIt("Should be returning True!")
+        return True 
     
     def GetGoogleMapURL(self, results):
         markers = "&markers=color:red|label:You|"+str(self.lat)+","+str(self.lng)
@@ -139,7 +177,7 @@ class GenericRequest(object):
             markers = markers + "&markers=color:blue|label:"+str(i)+"|"+str(res.latitude)+","+str(long) 
             i=i+1
         url="http://maps.google.com/maps/api/staticmap?center="+str(self.lat)+","+str(self.lng)
-        url=url+"&zoom=14&size=512x512&maptype=roadmap&sensor=false"+markers+"&key="+GOOGLE_KEY
+        url=url+"&zoom=14&size=512x512&maptype=roadmap&sensor=false&mobile=false"+markers+"&key="+GOOGLE_KEY
         return(url)
     
     def getAttachment(self):
@@ -149,7 +187,7 @@ class GenericRequest(object):
         return
     
     def WebResults(self):
-        return "I didn't get you!?  Try 'HELP' for more info."
+        return CONFUSION + " (" + self.AdditionalInfo + ")"
     
     def MailResults(self):
         return self.WebResults()
@@ -157,23 +195,40 @@ class GenericRequest(object):
     def geoTagIt(self):
         if len(self.address) < 1:
             return
+        
+        RegEx = re.compile('New York|Manhattan|Brooklyn|Queens|Staten Island|Bronx|SI|BK|NY', re.I)
+        #No Borough specified, default to New York
+        if RegEx.search(self.address) is None:
+            self.address += " New York"
+        
+        #Google likes "and" better than "&".
+        self.address = self.address.replace("&", "and")
+        self.address = self.address.replace("amp;", "")
                         
         g = geocoders.Google(GOOGLE_KEY)
         y = geocoders.Yahoo(YAHOO_KEY)
          
         try:
             place, (lat, lng) = g.geocode(self.address)
-        except ValueError:    
-            place, (lat, lng) = y.geocode(self.address)
+        except ValueError:
+            try:    
+                place, (lat, lng) = y.geocode(self.address)
+            except:                
+                return
+                
         self.place = place
         self.lat = lat
         self.lng = lng
+        self.IsGeoTagged = True
                 
 class LocateRequest(GenericRequest):
     '''
     LocateRequest - handles requests to find entities
     '''
 
+    def validate(self):        
+        return self.IsGeoTagged
+    
     def execute(self):
         lng_min = self.lng - RANGE
         lng_max = self.lng + RANGE
@@ -217,13 +272,11 @@ class LocateRequest(GenericRequest):
         
     def WebResults(self):
         Res_HTML = ""
-        results = self.SearchResults[0:5]
+        results = self.SearchResults[self.results_index:self.results_index+5]        
         url = self.GetGoogleMapURL(results)
-        #TODO: we need to maintain proper counter - use result array index somehow?
-        i=1       
         for res in results:
-            Res_HTML += "(" + str(i) + ") " + res.description() +"<br>"            
-            i=i+1        
+            Res_HTML += "(%s) %s<br>" % (self.results_index+1,res.description())
+            self.results_index+=1
         Res_HTML += "</div></div><br><br><br><p><img border=\"0\" src=\""
         Res_HTML += url
         return Res_HTML
@@ -232,8 +285,9 @@ class LocateRequest(GenericRequest):
         body = "Results:\n"
         results = self.SearchResults[self.results_index:self.results_index+5]
         for res in results:
-            body = body + "(" + str(self.results_index+1) + ") " + res.description()
+            body += "(%s) %s\n" % (self.results_index+1,res.description())
             self.results_index += 1
+        body += "Reply 'more' for additional results."
         return body
     
     def getAttachment(self):
@@ -263,6 +317,7 @@ class AltParking(GenericRequest):
         for res in results:
             body = body + "(" + str(self.results_index+1) + ") " + res.date.strftime("%m/%d/%y") + " - " + res.reason + line_break
             self.results_index += 1
+        body += "Reply 'more' for additional results."            
         return body            
     
     def MailResults(self):
@@ -274,3 +329,30 @@ class HelpRequest(GenericRequest):
     '''
     def WebResults(self):
         return HELP_STRING
+    
+class FeedbackRequest(GenericRequest):
+    '''
+    FeedbackRequest - handles feedback
+    '''
+    
+    '''
+    Parse the feedback and store in the database.
+    Include User / Location / Feedback Type / Feedback Date / Photo
+    '''
+    def execute(self):
+        feedback = Feedback()
+        feedback.feedback_type = self.type
+        feedback.address = self.address
+        feedback.latitude = self.lat
+        feedback.longitude = self.lng
+        feedback.user_input = self.query
+        feedback.contact = self.sender
+        feedback.date = datetime.now()
+        if self.attachment is not None:
+            feedback.attach_name = self.attachment[0]
+            feedback.attach = self.attachment[1]
+        self.LogIt("About to submit Feedback!")
+        feedback.put()
+        
+    def WebResults(self):
+        return "Thank you for your feedback! You can visit http://nycsamosa.appspot.com/dashboard to see it."
