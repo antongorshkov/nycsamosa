@@ -3,38 +3,57 @@ import cgi
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
+from google.appengine.ext import db
 from google.appengine.api import memcache
 from helpers import logger
 from helpers import parser
+from dashboard import *
 import request
-import re
+import re 
 
 #TODO: MOVE THESE to common constant files!
-GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
+#Previous one:
+#GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
+
+#Anton got this one:
+GOOGLE_KEY = 'ABQIAAAAtaHRQFa02xlz0i3fu8ySPxSH7FXBwHSUoWsCAYRfqtoxAWqychQGBY8Apv9gr2X3FlFUW82d0SluZg'
 YAHOO_KEY = 'u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB'
 
-#TODO: CODE REPEAT on the Static Map stuff.  Should be a single library that takes an array of markers?
-#TODO: The Try Google if doesn't work, do Yahoo functionality needs to be encapsulated somewhere 
-#(at least implement in the mail Handler
-
 class MailHandler(InboundMailHandler):
+    def goodDecode(self, encodedPayload):
+        encoding = encodedPayload.encoding
+        payload = encodedPayload.payload
+        if encoding and encoding.lower() != '7bit':
+            payload = payload.decode(encoding)
+        return payload
+
     def receive(self, mail_message):
         logger.LogIt("Received a message from: " + mail_message.sender)
         logger.LogIt("Subject: " + mail_message.subject)
+        attachment = []
+        logger.LogIt( str(mail_message.bodies))
+        image = mail_message.bodies(content_type='image/jpeg')
+        for i in image:
+            pic = i[1]
+        
+        if pic is not None:
+            attachment = ("hey!",db.Blob(self.goodDecode(pic)))
+                        
         m = memcache.Client()
         plaintext = mail_message.bodies(content_type='text/plain')
         for text in plaintext:
             txtmsg = ""
             txtmsg = text[1].decode()
         
+        txtmsg = txtmsg.split("\n")[0]
         logger.LogIt("Body is %s" % txtmsg)
         logger.LogIt("Length of body is: " + str(len(txtmsg)))        
-        req = m.get(mail_message.sender)
+        req = None
         More_RegEx = re.compile('more|yes|next', re.I)           
         if req is not None and More_RegEx.search(txtmsg) is not None:
             req.sendMail(mail_message.subject)            
         else:
-            req = request.RequestHandler(txtmsg,mail_message.sender)
+            req = request.RequestHandler(txtmsg,mail_message.sender,attachment)
             req.execute()
             req.sendMail(mail_message.subject)
     
@@ -56,37 +75,30 @@ class WebSMS(webapp.RequestHandler):
     def post(self):
         logger.LogIt("WebSMS post called" )
         txtQuery = parser.ParseIt(cgi.escape(self.request.get('sms')))
-        req = request.RequestHandler(txtQuery)
+        req = request.RequestHandler(txtQuery,"Web Request")
         req.execute()
         self.response.out.write( req.showWeb() )
         m = memcache.Client()
         if not m.set("123", req, 60):
             self.response.out.write( 'Problemo using memcache!' )
         
-class QuickClass(webapp.RequestHandler):
-    def get(self):
-        self.response.out.write("Hello There5!<br>")
-        m = memcache.Client()
-        req = m.get("123")
-        self.response.out.write(req.getData())
-        #z = array.array('L')
-        #f = open('./FASTLEXICON_3.MDF','rb')
-        #print f
-        #z.fromfile(f,125000)
-        #print len(z)        
-        #print z
+class DashboardClass(webapp.RequestHandler):
+    def get(self):  
+        self.response.out.write(getDashBoard())
 
-#        q = MontyLingua.MontyLingua()
-#        sentence = 'Show me events near 54th and 5th ave'
-#        q.pp_info(q.jist(sentence))        
-#        text = nltk.word_tokenize("pothole on 54th St and Lexington Ave?")
-#        text_tagged = nltk.pos_tag(text)
-#        print text_tagged
-            
+class ImageClass(webapp.RequestHandler):
+    def get(self):
+        key_str = self.request.get('key')
+        key = db.Key(key_str)
+        res = db.get(key)
+        self.response.headers['Content-Type'] = 'image/jpeg'
+        self.response.out.write(res.attach)
+
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
                                       ('/websms', WebSMS),
-                                      ('/q', QuickClass),                                      
+                                      ('/dashboard', DashboardClass),
+                                      ('/image', ImageClass),                                      
                                       MailHandler.mapping()
                                       ],                                      
                                      debug=True)
