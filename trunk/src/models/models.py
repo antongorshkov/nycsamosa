@@ -18,7 +18,9 @@ class Event(db.Model):
     latitude = db.FloatProperty()
     distance = db.FloatProperty()
     def description(self):
-        return self.eventName + ": " + self.eventDescription + " @ " + self.location + "(" + str(self.distance) + " miles)"
+        return "%s: %s @ %s (%.1g miles)" % (self.eventName,self.eventDescription,self.location,self.distance)
+#        return self.eventName + ": " + self.eventDescription + " @ " + self.location + "(" + str(self.distance) + " miles)"
+#        Res_HTML += "(%s) %s (%.1g miles)<br>" % (self.results_index+1,res.description(),res.distance)
     def long(self):
         return "longtitude"
        
@@ -102,3 +104,14 @@ class WifiSpot(db.Model):
     
     def long(self):
         return "longitude"
+
+class Feedback(db.Model):
+    feedback_type = db.StringProperty
+    address = db.StringProperty()
+    latitude = db.FloatProperty()
+    longitude = db.FloatProperty()
+    user_input = db.StringProperty()
+    contact = db.StringProperty()
+    date = db.DateTimeProperty()
+    attach_name =  db.StringProperty()
+    attach = db.BlobProperty()
