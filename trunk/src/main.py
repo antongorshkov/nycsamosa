@@ -9,7 +9,8 @@ from helpers import logger
 from helpers import parser
 from dashboard import *
 import request
-import re 
+import re
+
 
 #TODO: MOVE THESE to common constant files!
 #Previous one:
@@ -31,6 +32,7 @@ class MailHandler(InboundMailHandler):
         logger.LogIt("Received a message from: " + mail_message.sender)
         logger.LogIt("Subject: " + mail_message.subject)
         attachment = []
+        pic = None
         logger.LogIt( str(mail_message.bodies))
         image = mail_message.bodies(content_type='image/jpeg')
         for i in image:
@@ -38,20 +40,20 @@ class MailHandler(InboundMailHandler):
         
         if pic is not None:
             attachment = ("hey!",db.Blob(self.goodDecode(pic)))
-                        
-        m = memcache.Client()
+                                    
         plaintext = mail_message.bodies(content_type='text/plain')
         for text in plaintext:
             txtmsg = ""
             txtmsg = text[1].decode()
-        
         txtmsg = txtmsg.split("\n")[0]
         logger.LogIt("Body is %s" % txtmsg)
-        logger.LogIt("Length of body is: " + str(len(txtmsg)))        
-        req = None
+        logger.LogIt("Length of body is: " + str(len(txtmsg)))
+        m = memcache.Client()
+        req = m.get(mail_message.sender)
         More_RegEx = re.compile('more|yes|next', re.I)           
         if req is not None and More_RegEx.search(txtmsg) is not None:
-            req.sendMail(mail_message.subject)            
+            logger.LogIt("This is a MORE Request!")
+            req.sendMail(mail_message.subject,txtmsg)            
         else:
             req = request.RequestHandler(txtmsg,mail_message.sender,attachment)
             req.execute()
@@ -63,24 +65,32 @@ class MailHandler(InboundMailHandler):
         
 class MainPage(webapp.RequestHandler):
     def get(self):
-        logger.LogIt("MainPage got called" )
+        logger.LogIt("MainPage got called from ip: %s of type %s" % (self.request.remote_addr, type(self.request.remote_addr)) )
         self.response.out.write("""
           <html><body>
-              <form action="/websms" method="post">
+              <form action="/websms" method="get">
               <input type="text" value="" name="sms" id="searchTerm" size="45" ><input type="submit" value="Send SMS to Samosa4!">
               </form></body></html>""")
 
-
+#TODO: DRY in WebSMS and MailHandler - one function!!!
 class WebSMS(webapp.RequestHandler):
-    def post(self):
-        logger.LogIt("WebSMS post called" )
+    def get(self):
+        ip = self.request.remote_addr
+        logger.LogIt("WebSMS post called from ip: %s" % ip )
         txtQuery = parser.ParseIt(cgi.escape(self.request.get('sms')))
-        req = request.RequestHandler(txtQuery,"Web Request")
-        req.execute()
-        self.response.out.write( req.showWeb() )
         m = memcache.Client()
-        if not m.set("123", req, 60):
-            self.response.out.write( 'Problemo using memcache!' )
+        req = m.get(ip)
+        More_RegEx = re.compile('more|yes|next', re.I)           
+        if req is not None and More_RegEx.search(txtQuery) is not None:
+            self.response.out.write( req.showWeb(txtQuery) )            
+        else:
+            req = request.RequestHandler(txtQuery,"Web Request")
+            req.execute()
+            self.response.out.write( req.showWeb() )
+        
+        #Always set the Request object back to memory as it has updated info
+        if not m.set(ip, req ):
+            logger.LogIt("Error storing request in memcache")
         
 class DashboardClass(webapp.RequestHandler):
     def get(self):  
