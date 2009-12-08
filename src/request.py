@@ -15,6 +15,10 @@ from urllib2 import urlopen
 from models.models import * #@UnusedWildImport google wants it!
 import re
 from datetime import date, datetime
+from dateutil.relativedelta import *
+from dateutil.parser import *
+from feedparser import feedparser
+from helpers.traffic import Traffic
 
 #Previous Key:
 #GOOGLE_KEY = 'ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA'
@@ -35,13 +39,14 @@ You can also search for Wifi, Parking
 You can also search for wifi, parking.  You can ask for Alternate Parking rules!  
 """
 CONFUSION = "I'm sorry, I didn't understand you.  Please try again or reply 'HELP' for more info."
+EVENTS_RSS='http://www.nycgovparks.org/xml/events_300_rss.xml'
 
 class RequestHandler(object):
     '''
     RequestHandler - handles every request
     '''
 
-    def __init__(self, input, sender = None, attachment = None ):
+    def __init__(self, input, sender = None, attachment = [] ):
         '''
         Constructor
         '''
@@ -73,13 +78,20 @@ class RequestHandler(object):
                  #RegEx to match agains                [ ClassName        Type     ]
                  #Misc.
                  re.compile('alternate|altpark', re.I):     [ "AltParking", "AltParking"],
+                 re.compile('event|happening', re.I):       [ "EventRequest", "EventRSS"],
+                 re.compile('traffic', re.I):               [ "TrafficRequest", "TrafficRSS"],
+                                  
                  #Location Based
-                 re.compile('event|happenings', re.I):      [ "LocateRequest", "Event" ],
+                 #re.compile('event|happenings', re.I):      [ "LocateRequest", "Event" ],
                  re.compile('laund|cleaners', re.I):        [ "LocateRequest", "Laundromat"],                 
                  re.compile('parking|park', re.I):          [ "LocateRequest","Parking"],
                  re.compile('cafe|restaurant', re.I):       [ "LocateRequest", "SidewalkCafe"],
-                 re.compile('wifi|wireless|internet', re.I):[ "LocateRequest", "WifiSpot"],                 
-
+                 re.compile('wifi|wireless|internet', re.I):[ "LocateRequest", "WifiSpot"],                                  
+                                  
+                 #Help
+                 re.compile('\?|help', re.I):               [ "HelpRequest", "HELP" ],
+                 }
+        FeedbackRules = {        
                  #Feedback Requests
                  re.compile("tree", re.I):                  [ "FeedbackRequest", "DAMAGED_TREE" ],
                  re.compile("sign", re.I):                  [ "FeedbackRequest", "STREET_SIGN" ],
@@ -88,28 +100,43 @@ class RequestHandler(object):
                  re.compile("street", re.I):                [ "FeedbackRequest", "STREET_CONDITION" ],
                  re.compile("taxi", re.I):                  [ "FeedbackRequest", "TAXI_LOST" ],
                  re.compile("graf", re.I):                  [ "FeedbackRequest", "BUILD_GRAFFITI" ],
-                                  
-                 #Help
-                 re.compile('\?|help', re.I):               [ "HelpRequest", "HELP" ],
+                 re.compile("broken|dirty|missing|filthy|unsafe|damaged", re.I):                  [ "FeedbackRequest", "OTHER" ],
                  }        
         query = self.user_input
         address = ""
-        #We assume having @ means there is an address
-        if "@" in self.user_input:        
-            ( query, address ) = self.user_input.split("@",1)
+        #We assume having @/at/around means there is an address
+        AddrRegEx = re.compile("@| around | at | near")
+        if AddrRegEx.search(query) is not None:
+            ( query, address ) = re.split(AddrRegEx,self.user_input,1)      
             
+        match = False
         for RegEx, Request in Rules.iteritems():                   
             if RegEx.search(query) is not None:
                 try:
                     self.LogIt("Trying to instantiate " + Request[0])
                     self.Request = globals()[Request[0]](Request[1], query, address, self.sender, self.attachment)
+                    match = True
                 except:
                     self.LogIt("Failed, going for UNKNOWN" + str(sys.exc_info()[0]))
                     self.Request = GenericRequest("UNKNOWN")
                     if Request[0] == "LocateRequest" and address == "":
                         self.Request.AdditionalInfo = "missing location"
                 break    #First Rule Wins!            
-       
+        
+        #TODO: DRY AGAIN! STP COPY N PASTE
+        if not match:
+            for RegEx, Request in FeedbackRules.iteritems():                   
+                if RegEx.search(query) is not None:
+                    try:
+                        self.LogIt("Trying to instantiate " + Request[0])
+                        self.Request = globals()[Request[0]](Request[1], query, address, self.sender, self.attachment)
+                        match = True
+                    except:
+                        self.LogIt("Failed, going for UNKNOWN" + str(sys.exc_info()[0]))
+                        self.Request = GenericRequest("UNKNOWN")
+                        if Request[0] == "LocateRequest" and address == "":
+                            self.Request.AdditionalInfo = "missing location"
+                    break    #First Rule Wins!
     def execute(self):
         '''
         Execute the Request.  If its a query, issue the search and store results on the object
@@ -118,16 +145,17 @@ class RequestHandler(object):
         self.Request.execute()
 
 
-    def showWeb(self):
+    def showWeb(self, more=None):
         Res_HTML = """<body style="background-image:url(http://www.google.com/sms/images/bigphone.jpg); background-repeat:no-repeat"> <div id=cellphoneDiv style="margin: 93px 0px 0px 37px; height: 218px; width: 164px; overflow: auto;"> <div id=inbox align=center style="font-family: arial; font-size: 80%;"><br></div><div id=messageBox style="font-family: arial; font-size: 80%; font-weight: bold; white-space: -moz-pre-wrap; word-wrap: break-word;">"""
-        Res_HTML += self.Request.WebResults()                      
-        Res_HTML += "\"/></p></body></html>"
+        Res_HTML += self.Request.WebResults(more)                      
+        Res_HTML += "</p></body></html>"
         return Res_HTML
 
-    def sendMail(self, subject):        
+    def sendMail(self, subject, more=None):        
         subject = "Re: " + subject       
         attachment = self.Request.getAttachment()
-        body = self.Request.MailResults()        
+        logger.LogIt("Calling Request.MailResults(more)")
+        body = self.Request.MailResults(more)        
         if len(attachment):
             mail.send_mail(sender=EMAIL_SENDER,to=self.sender,subject=subject,body=body,attachments=attachment)
         else:
@@ -141,7 +169,7 @@ class GenericRequest(object):
     GenericRequest - base request object.
     '''
 
-    def __init__(self, type, query="", address="", sender="", attachment=None):
+    def __init__(self, type, query="", address="", sender="", attachment=[]):
         '''
         Constructor
         '''
@@ -186,10 +214,10 @@ class GenericRequest(object):
     def execute(self):
         return
     
-    def WebResults(self):
+    def WebResults(self, more=None):
         return CONFUSION + " (" + self.AdditionalInfo + ")"
     
-    def MailResults(self):
+    def MailResults(self, more=None):
         return self.WebResults()
         
     def geoTagIt(self):
@@ -215,8 +243,9 @@ class GenericRequest(object):
                 place, (lat, lng) = y.geocode(self.address)
             except:                
                 return
-                
-        self.place = place
+
+        RegEx = re.compile("New York|NY|USA|,")
+        self.place = re.sub(RegEx, "", place)        
         self.lat = lat
         self.lng = lng
         self.IsGeoTagged = True
@@ -270,8 +299,8 @@ class LocateRequest(GenericRequest):
         
         self.SearchResults = ret_results[0:25]
         
-    def WebResults(self):
-        Res_HTML = ""
+    def WebResults(self, more=None):
+        Res_HTML = "Results near %s:<br>" % self.place
         results = self.SearchResults[self.results_index:self.results_index+5]        
         url = self.GetGoogleMapURL(results)
         for res in results:
@@ -281,8 +310,8 @@ class LocateRequest(GenericRequest):
         Res_HTML += url
         return Res_HTML
     
-    def MailResults(self):
-        body = "Results:\n"
+    def MailResults(self, more=None):        
+        body = "Results near %s:\n" % self.place
         results = self.SearchResults[self.results_index:self.results_index+5]
         for res in results:
             body += "(%s) %s\n" % (self.results_index+1,res.description())
@@ -311,7 +340,7 @@ class AltParking(GenericRequest):
             ret_results.append( result )        
         self.SearchResults = ret_results[0:100]
 
-    def WebResults(self, line_break="<br>"):
+    def WebResults(self, more=None, line_break="<br>"):
         body = "Upcoming Alternate Parking Holidays:\n"
         results = self.SearchResults[self.results_index:self.results_index+5]
         for res in results:
@@ -320,14 +349,14 @@ class AltParking(GenericRequest):
         body += "Reply 'more' for additional results."            
         return body            
     
-    def MailResults(self):
-        return self.WebResults("\n")
+    def MailResults(self, more=None):        
+        return self.WebResults(None, "\n")
 
 class HelpRequest(GenericRequest):
     '''
     HelpRequest - handles requests for Help
     '''
-    def WebResults(self):
+    def WebResults(self, more=None):
         return HELP_STRING
     
 class FeedbackRequest(GenericRequest):
@@ -348,11 +377,146 @@ class FeedbackRequest(GenericRequest):
         feedback.user_input = self.query
         feedback.contact = self.sender
         feedback.date = datetime.now()
-        if self.attachment is not None:
+        if len(self.attachment) > 1:
             feedback.attach_name = self.attachment[0]
             feedback.attach = self.attachment[1]
         self.LogIt("About to submit Feedback!")
         feedback.put()
         
-    def WebResults(self):
-        return "Thank you for your feedback! You can visit http://nycsamosa.appspot.com/dashboard to see it."
+    def WebResults(self, more=None):
+        return "Thank you for your feedback! You can visit http://nycsamosa.appspot.com/dashboard to see it.(loc:%s)" % self.place
+
+class EventRequest(GenericRequest):
+    '''
+    EventRequest - handle RSS Events
+    '''
+    
+    def execute(self):
+        def ParseDate(dt):
+            TODAY = date.today()
+            WordDates = {   'today'     : TODAY, 
+                            'tomorrow'  : TODAY+relativedelta(days=+1),
+                            'monday'    : TODAY+relativedelta(weekday=MO),
+                            'tuesday'   : TODAY+relativedelta(weekday=TU),
+                            'wednesday' : TODAY+relativedelta(weekday=WE),
+                            'thursday'  : TODAY+relativedelta(weekday=TH),
+                            'friday'    : TODAY+relativedelta(weekday=FR),
+                            'saturday'  : TODAY+relativedelta(weekday=SA),
+                            'sunday'    : TODAY+relativedelta(weekday=SU),                                
+            }
+            dt = dt.lower()
+            real_date = None
+            try:
+                real_date = WordDates[dt]
+                real_date = datetime(real_date.year, real_date.month, real_date.day)
+            except:
+                try:
+                    real_date = parse(dt)
+                except:
+                    return
+            
+            return real_date
+        
+        #Continiously try to remove first word until you can find a date
+        def ParseInput(inp):
+            dt = ParseDate(inp)
+            if dt is None:
+                spl = inp.split(" ", 1)
+                if len(spl) > 1:
+                    return ParseInput(spl[1])
+                else:
+                    return None
+            else:
+                return dt
+        
+        dt = ParseInput(self.query)
+        if dt is None:
+            dt = date.today()
+            dt = datetime(dt.year, dt.month, dt.day)
+        self.event_date = dt    
+        d = feedparser.parse(EVENTS_RSS)
+        self.LogIt("Looking for events on %s" % dt)
+        ret_results = []
+        for e in d.entries:
+            event_date = parse(e.startdate)
+            if event_date == dt:
+                ret_results.append( e )
+        
+        self.LogIt("Found %s events " % len(ret_results))
+        self.SearchResults = ret_results[0:25]
+        
+    def WebResults(self, more=None, line_break="<br>"):
+        return self.MailResults(more, line_break)
+        
+    def MailResults(self, more=None, line_break="\n"):        
+        #Display back (with option to ask for details!)
+        #Lets see if its a detail request
+        self.LogIt("Inside MailResults... more: %s" % more)        
+        if more is not None:
+            num = None
+            RegEx = re.compile("[0-9]+")            
+            found = RegEx.search(more)
+            if found is not None:
+                num = int(found.group(0))
+                
+            if num is not None:
+                desc = self.SearchResults[num-1].description
+                if line_break == "\n":
+                    desc = desc.replace("</p>","\n")
+                    RegEx = re.compile('<.*?>', re.I)
+                    desc = re.sub(RegEx, "", desc)
+                return desc
+        body = "Events on %s:%s" % (self.event_date.strftime("%m/%d/%y"),line_break)
+
+        results = self.SearchResults[self.results_index:self.results_index+5]
+        for res in results:
+            body = body + "(" + str(self.results_index+1) + ") " + res.title + line_break
+            self.results_index += 1
+        
+        if self.results_index>len(self.SearchResults)-1:
+            body += "End of Results."
+        else:
+            body += "Reply 'more' for additional results or 'more 1' for details on #1 ."            
+        return body
+
+class TrafficRequest(GenericRequest):
+    '''
+    TrafficRequest - handle Traffic
+    '''    
+    def execute(self):
+        inp = self.query
+        inp = inp.replace("traffic","")
+        inp = inp.replace("from","")
+        res = inp.split(" to ",1)
+        if len(res) != 2:
+            self.SearcgResults = ["Bad Input", "Couldn't Understand your request"]
+        else:
+            (self.from_addr,self.to_addr) = res
+            t = Traffic(self.from_addr,self.to_addr)
+            self.SearchResults = t.relevantUpdates()
+
+#TODO: DRY! Same as in previous class.
+    def WebResults(self, more=None, line_break="<br>"):
+        return self.MailResults(more, line_break)
+        
+    def MailResults(self, more=None, line_break="\n"):        
+        if more is not None:
+            num = None
+            RegEx = re.compile("[0-9]+")            
+            found = RegEx.search(more)
+            if found is not None:
+                num = int(found.group(0))
+                
+            if num is not None:
+                return self.SearchResults[num-1][0]+ ":" + line_break + self.SearchResults[num-1][1]
+
+        body = "Traffic updates on your route:%s" % line_break
+        results = self.SearchResults[self.results_index:self.results_index+10]
+        for res in results:
+            body = body + "(" + str(self.results_index+1) + ") " + res[0] + line_break
+            self.results_index += 1
+        if self.results_index>len(self.SearchResults)-1:
+            body += "End of Results."
+        else:
+            body += "Reply 'more' for additional results or 'more 1' for details on #1 ."    
+        return body
