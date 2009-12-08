@@ -105,7 +105,7 @@ class RequestHandler(object):
         query = self.user_input
         address = ""
         #We assume having @/at/around means there is an address
-        AddrRegEx = re.compile("@| around | at | near")
+        AddrRegEx = re.compile("@| around | at | near |close to")
         if AddrRegEx.search(query) is not None:
             ( query, address ) = re.split(AddrRegEx,self.user_input,1)      
             
