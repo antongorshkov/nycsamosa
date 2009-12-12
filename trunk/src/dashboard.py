@@ -20,18 +20,39 @@ def getDashBoard():
 #Yahoo!
 def showmap2():
     res = """  
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
 <head>
-<style type="text/css">
-#map{
-height: 75%;
-width: 100%;
-}
-</style>
+    <title>NYCSamosa</title>
+    <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=iso-8859-1" />
+    <meta name="author" content="Jenna Smith" />
+    <meta name="copyright"    content="Copyright 2006 growldesign" />    
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />    
+    <meta http-equiv="imagetoolbar" content="no" />
+    <link href="static/bc-stylesheet.css" rel="stylesheet" type="text/css" />
 </head>
-<body>
-<div id="map"></div>
 
+<body>
+<div id="container">
+    <div id="header"><div>
+        <ul>
+            <li><a href="http://nycsamosa.appspot.com/static/sms.html#demo" class="on">demo</a></li>
+            <li><a href="http://nycsamosa.appspot.com/static/sms.html#features">features</a></li>
+            <li><a href="http://nycsamosa.appspot.com/dashboard">dashboard</a></li>
+            <li><a href="http://nycsamosa.appspot.com/static/sms.html#contact">contact</a></li>
+        </ul>
+        <h1><a href="#">NYCSamosa</a></h1>
+    </div></div>
+    <div id="content">
+        <div id="right">
+            <h2 id="demo">311 <em>Dashboard</em></h2>
+            <p>
+            311 complaints submitted via SMS or Web-based interface will show up on the map below.  Clicking on the marker
+            displays complaint details along with any pictures.  
+            </p>
+
+        <div id="map">
 <script type="text/javascript" src="http://api.maps.yahoo.com/ajaxymap?v=3.8&appid=rfaEY5HV34FgMWkBkyLlbKKizvfDlkRnZb7sBWE4u7HtfedNUmB10QOvfFYQop3b"></script>
 <script type="text/javascript">
     // Create a map object
@@ -92,6 +113,10 @@ width: 100%;
     // Display the map centered on a geocoded location
     map.drawZoomAndCenter("New York", 6);
 </script>
+</div></div></div>
+<div id="footer"> 
+    <p>Copyright &copy; 2009 Anton Gorshkov & David Rytzarev. All Rights Reserved. | design by <a href="http://www.growldesign.co.uk">growldesign</a></p>
+</div>
 </body>
 </html>
 """  
