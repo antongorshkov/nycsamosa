@@ -1,167 +1,185 @@
-<!DOCTYPE html>
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="description" content="Samosa!">
-    <title>NYC Samosa on your Mobile Phone</title>
-  </head>
-  <body>
-    <div class="page">       
-        HEY!      
-    </div>
-      
-<style type="text/css">
-  .sms-disclaimer {
-    width:80%;
-    margin:20px auto;
-    text-align:left;
-  }
-</style>
-<div class="g-section g-tpl-50-50 product-columns hr">
-  <h3>Try an Interactive Demo</h3>
-  <div class="g-unit g-first">
-    <p>Click a "Search Feature" to learn more or a "Sample Query" to view sample search results.
-    <form action="#demotop" id="demo" name="demo" onsubmit="return searchFor(document.getElementById('searchTerm').value);" method="post">
-      <input type="text" value="" name="searchTerm" id="searchTerm" size="25" onkeydown="if (event.keyCode == 13) return searchFor(searchTerm.value)" />
-      <input type="hidden" name="country" value="us">
-      <input type="hidden" value="http://nycsamosa.appspot.com/websms?sms=" id="searchUrl" name="searchUrl">
-      <input type="submit" value="Send">
-      <br />
-      <br />
-    </form>
-    <table border="0" width="50%" cellspacing="0" cellpadding="0" class="sms-demos">
-      <tr>
-        <th width="140">Search Feature</th>
-        <th>Sample Query</th>
-
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('parking@10001'); "><strong>Parking</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('sushi 94040'); ">sushi 94040</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help weather'); "><strong>Weather</strong></a></td>
-
-        <td><a href="javascript:{}" onclick="searchFor('weather boston'); "><strong>weather</strong> boston</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help glossary'); "><strong>Glossary</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('define zenith'); "><strong>define</strong> zenith</a></td>
-
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help sports'); "><strong>Sports</strong></a>**</td>
-        <td><a href="javascript:{}" onclick="searchFor('score red sox'); "><strong>score</strong> red sox</a></td>
-      </tr>
-      <tr>
-
-        <td><a href="javascript:{}" onclick="searchFor('help movies'); "><strong>Movies</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('movies 94110'); "><strong>movies</strong> 94110</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help stocks'); "><strong>Stocks</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('stock tgt'); "><strong>stock</strong> tgt</a></td>
-
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help zip code'); "><strong>Zip Codes</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('zip code 72202'); "><strong>zip code</strong> 72202</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help directions'); "><strong>Directions</strong></a></td>
-
-        <td><a href="javascript:{}" onclick="searchFor('directions pasadena ca to 94043'); "><strong>directions</strong> pasadena ca <strong>to</strong> 94043</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help maps'); "><strong>Maps</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('map 5th avenue new york'); "><strong>map</strong> 5th avenue new york</a></td>
-
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help flights'); "><strong>Flights</strong></a>***</td>
-        <td><a href="javascript:{}" onclick="searchFor('flight aa 2111'); "><strong>flight</strong> aa 2111</a></td>
-      </tr>
-      <tr>
-
-        <td><a href="javascript:{}" onclick="searchFor('help area code'); "><strong>Area Codes</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('area code 650'); "><strong>area code</strong> 650</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help products'); "><strong>Products</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('price ipod player 40gb'); "><strong>price</strong> ipod player 40gb</a></td>
-
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help q&amp;a'); "><strong>Q&amp;A</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('abraham lincoln birthday'); ">abraham lincoln birthday</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help airlines'); "><strong>Airlines</strong></a>***</td>
-
-        <td><a href="javascript:{}" onclick="searchFor('united airlines'); ">united airlines</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help translation'); "><strong>Translation</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('translate hello in french'); "><strong>translate</strong> hello <strong>in</strong> french</a></td>
-
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help web snippets'); "><strong>Web Snippets</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('web hubble telescope'); "><strong>web</strong> hubble telescope</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help calculator'); "><strong>Calculator</strong></a></td>
-
-        <td><a href="javascript:{}" onclick="searchFor('1 us pint in liters'); ">1 us pint <strong>in</strong> liters</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help currency conversion'); "><strong>Currency Conversion</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('8 usd in yen'); ">8 usd <strong>in</strong> yen</a></td>
-
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help airports'); "><strong>Airports</strong></a>***</td>
-        <td><a href="javascript:{}" onclick="searchFor('sfo airport'); ">sfo <strong>airport</strong></a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help metar'); "><strong>METAR</strong></a>****</td>
-
-        <td><a href="javascript:{}" onclick="searchFor('metar khio'); "><strong>metar</strong> khio</a></td>
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help'); "><strong>Help</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('help local'); "><strong>help</strong> local</a></td>
-
-      </tr>
-      <tr>
-        <td><a href="javascript:{}" onclick="searchFor('help time'); "><strong>Local time</strong></a></td>
-        <td><a href="javascript:{}" onclick="searchFor('time new york'); "><strong>time</strong> new york</a></td>
-      </tr>
-    </table>
-  </div>
-
-  <div class="g-unit" style="text-align:center"-->
-    <div class="demosms-iframe" style="margin:0 auto; text-align:center;">
-      <iframe src="http://nycsamosa.appspot.com" style="margin:0 auto;" id="demoframe" name="demoframe" width="252" height="448" frameborder="0"></iframe>
-    </div>
-    <script type="text/javascript">
-      var url = String(window.location);
-      var match = url.match(/q\=(.*)[&#?]*/);
-      if(match) {
-        gframe = document.getElementById("demoframe");
-        gframe.src = gframe.src + "&q=" + match[1];
-        if (document.getElementById("demo")) {
-          document.getElementById("demo").searchTerm.value = unescape(match[1]);
-        }
-      }
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+	<meta http-equiv="Expires" content="Mon, 26 Jul 1997 05:00:00 GMT">
+	<meta http-equiv="Cache-Control" content="no-cache">
+	<meta http-equiv="Pragma" content="no-cache"> 
+  <title>NYC Samosa!</title>
+</head>
+<body>
+<br>
+<div style="text-align: center;" align="center">
+<table
+ style="width: 731px; height: 91px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td><img style="width: 257px; height: 46px;" alt="" src="nycsms.bmp"></td>
+      <td style="text-align: right;"><a href="http://www.nycbigapps.com/"><img style="width: 95px; height: 64px;" alt="" src="icon_nyc_big_apps.gif"></a></td>
+    </tr>
+  </tbody>
+</table>
+<table style="height: 270px; text-align: left; margin-left: auto; margin-right: auto;" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="width: 731px; text-align: left;"><span style="font-family: 'Verdana','sans-serif'; font-size: 12px; line-height: 20px;">
+      <div class="g-section g-tpl-50-50 product-columns hr">
+      <div style="margin-left: 14px; width: 731px;" class="g-unit g-first"><br>
+      <p><b>This is a demo of an SMS-enabled Web
+Application, designed for users to take advantage of New York City's <a href="http://nyc.gov/data">Data Mine</a>
+initiative.</b> With vast majority of people not having browser access on the go,
+we decided to design an SMS application that allows users submit 311 complaints and query several City Agency datasets without needing a computer or a fancy phone.</p>
+<p>To experience the demo, you can either <b>SMS to nycsamosa@gmail.com</b> from your cell phone or use the following interface. Type a query in this box or simply
+click the&nbsp;links below to view sample search results <b>in the cell phone screen below</b>.&nbsp;Try the same from any cell phone. After you get a list of results
+like Events 1-5, you can either send <b>more</b> for next batch or send <b>more</b> plus the number of event you want see details of: <b>more 4</b> to see details of the 4th event.
+<br></br>
+<div align="center">
+      <form action="#demotop" id="demo" name="demo" onsubmit="return searchFor(document.getElementById('searchTerm').value);" method="post"> 
+ <input value="" name="searchTerm" id="searchTerm"  size="25" 
+ onkeydown="if (event.keyCode == 13) return searchFor(searchTerm.value)"
+ type="text">
+  <input value="http://nycsamosa.appspot.com/websms?sms=" id="searchUrl" name="searchUrl" type="hidden">
+  <input value="Send" type="submit"> <br>
+</div>
+        <br>
+      </form>
+      <table border="0"><tr><td valign="top">
+      <table style="font-family: 'Verdana','sans-serif'; font-size: 12px; line-height: 20px; width: 241px; margin-left: 6px;"
+ class="sms-demos" border="0" cellpadding="0" cellspacing="0" width="50%">
+        <tbody>
+          <tr>
+            <th style="Zwidth: 150px;">Sample Query</th>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('Broken tree @ 180 madison'); ">Broken tree @ 180 madison</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('events today'); ">events today</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('events tomorrow'); ">events tomorrow</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('events on dec 10th'); ">events on dec 10th</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('events 12/14'); ">events 12/14</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('alternate'); ">alternate</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('traffic morristown, nj to 1 beard st, brooklyn'); ">traffic morristown, nj to 1 beard st, brooklyn</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('wifi near union square'); ">wifi near union square</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('parking around lincoln center'); ">parking around lincoln center</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('parking at lexington & E 54th'); ">parking at lexington &amp; E 54th</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('cafe @ flatiron'); ">cafe @ flatiron</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('laundry at 7th and 23rd'); ">laundry at 7th and 23rd</a></td>
+          </tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('help'); ">help</a></td>
+          </tr>
+          <tr>
+          <tr>
+            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('?'); ">?</a></td>
+          </tr>
+          <tr>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+      </div>
+      <div class="g-unit" style="text-align: center;" -="">
+<td>
+ <div style="margin: 0pt auto; text-align: center;"> 
+ <iframe src="http://nycsamosa.appspot.com/websms" style="margin: 0pt auto;" id="demoframe" name="demoframe" frameborder="0" height="448" width="600"></iframe>
+ </div>
+ </td></tr>
+ 	</table>
+      <script type="text/javascript">
+var url = String(window.location);
+var match = url.match(/q\=(.*)[&#?]*/);
+if(match) {
+gframe = document.getElementById("demoframe");
+gframe.src = gframe.src + "&q=" + match[1];
+if (document.getElementById("demo")) {
+document.getElementById("demo").searchTerm.value = unescape(match[1]);
+}
+}
 function searchFor(searchTerm) {
-  document.getElementById("demoframe").src = document.getElementById("searchUrl").value + encodeURIComponent(searchTerm);
-  document.demo.searchTerm.value = searchTerm;
-  return false;
+document.getElementById("demoframe").src = document.getElementById("searchUrl").value + encodeURIComponent(searchTerm);
+document.demo.searchTerm.value = searchTerm;
+return false;
 }
 searchFor('help');
-</script>
-  </div>
+      </script>
+      </div>
+      <div><br>
+One of the key efforts is to allow users to input natural phrases, without many restrictions by any special syntax. You still need to have correct order of elements, so it's not perfect yet, but
+getting there :)
+
+<h4>311 Reports</h4>
+      <p> After submitting a 311
+complaint, you can go to the 311 complaint Dashboard: <a href="http://nycsamosa.appspot.com/dashboard">http://nycsamosa.appspot.com/dashboard</a>
+
+and see where it fits on the NYC map along with other complaints. Report by typing <b>issue at <i>location</i></b>. <u>See examples above!</u>
+<p>
+<h4>Traffic Updates</h4>
+So, what if you drive through Manhattan every other week, to a different
+address in a different borough. Every time you turn on the radio for
+traffic updates, they talk about some place else... You want to know
+what's on your route, not somewhere else!&nbsp;You don't have a
+full blown browser in your phone to navigate through tiny controls and navigate to
+some fancy web site.&nbsp; You just want to know what to expect. <br>
+Query by typing <b>traffic <i>location1</i> to <i>location2</i></b>. <u>See examples above!</u>
+
+</p>
+
+<h4>Location-based Search</h4>
+Search for Cafes, Parking garages, Wifi hotspots or Laundromats. The search with return five closest hits, based on geographic location provided.  <br>Query by typing <b>cafe at <i>location</i></b>. <u>See examples above!</u>
+
+<h4>Event Search</h4>
+Upcoming NYC community events provided via RSS feed are available via date-based search. <br>Send <b>events <i>date</i></b>. <u>See examples above!</u>
+
+<h4>Alternate Parking Calendar</h4>
+Future Alternate Parking regulation suspension dates are available by simply sending <b>altparking</b>. <u>See examples above!</u>
+<p><p>
+So now you can use any simple cell phone, and benefit from the same, up-to-date information as
+those sitting by a PC and walking around with iPhones (not that they are not cool).  So it comes down to the associated costs or SMS'ing, which
+are dependent on the plan with your provider.
+      <br>
+This is a prototype. Long-term we envision users sending messages to 311 using a gateway. This
+significantly improves Quality of Service because we will bypass the
+email part completely!<br>
+      <br>
+      <div style="text-align: center;">Email the NYC Samosa team here: <span style="font-weight: bold;">samosateam@gmail.com</span><br>
+
+      </div>
+      </div>
+      </div>
+      </span></td>
+    </tr>
+  </tbody>
+</table>
+<div style="font-family: 'Verdana','sans-serif'; font-size: 10px;"
+ align="center"><img style="width: 400px; height: 1px;" alt=""
+ src="zdivider.jpg"><br>
+<a href="samosateam@gmail.com">contact</a><br>
+<br>
+
 </div>
-<p class="disclaimer"><p>* Important information about Samosa will appear here! (Dima updated last)</p>
+</div>
+</body>
+</html>
