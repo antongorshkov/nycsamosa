@@ -18,6 +18,9 @@ class Traffic():
         self.userOrig,self.userDest = user1,user2
         v = urllib.urlopen("http://a841-dotweb01.nyc.gov/datafeeds/WeeklyTraf.xml").read()
         self.s = v[:v.find('<pubDate>',v.find('</pubDate>'))]
+        gmaps = GoogleMaps('ABQIAAAAAnMK37-crb-IVXX2SNmBOhStP4HpWo52j4u-OwfYEqnsxFY73BSpaiVrjhMtwbsCCfu2NkyPhj6myA')
+        directions = gmaps.directions(self.userOrig,self.userDest)
+        
         #self.s = s        
     def betweenTags(self,str,begin,tag1,tag2):
         idx1 = str.find(tag1,begin)
