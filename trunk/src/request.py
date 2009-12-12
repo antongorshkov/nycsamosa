@@ -141,8 +141,8 @@ class RequestHandler(object):
         </div>
         </td>
         <td>
-        <div id=mapDiv style="margin: 39px 0px 5px 37px; height: 330px; width: 330px; overflow: auto;">
-        """
+        <div id=mapDiv style="margin: 39px 0px 5px 37px; height: 330px; width: 330px; overflow: auto; font-family: Tahoma, sans-serif; font-size: 76%; color: #888;">
+        """            
         if self.Request.img_url is not None:
             Res_HTML += "Image sent to phone:<br><img border=\"0\" src=\"%s\">" % self.Request.img_url
             
@@ -209,7 +209,7 @@ class GenericRequest(object):
             markers = markers + "&markers=color:blue|label:"+str(i)+"|"+str(res.latitude)+","+str(long) 
             i=i+1
         url="http://maps.google.com/maps/api/staticmap?center="+str(self.lat)+","+str(self.lng)
-        url=url+"&zoom=14&size=300x300&maptype=roadmap&sensor=false&mobile=false"+markers+"&key="+GOOGLE_KEY
+        url=url+"&zoom=15&size=200x200&maptype=roadmap&sensor=false&mobile=false"+markers+"&key="+GOOGLE_KEY
         return(url)
     
     def getAttachment(self):
