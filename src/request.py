@@ -29,7 +29,7 @@ YAHOO_KEY = 'u_EhiVnV34EZAxPQhoPq8dNEHGw8bUME10Hd7BYYwHZYB5irmhW90Q9d.VK_e1KB'
 MILE = 0.01502 #bad bad approximation - need to calculate more precise
 RANGE = MILE*0.1 #by default 5 mile 'radius', in future need to give option
 EMAIL_SENDER = "nycsamosa@gmail.com"
-HELP_STRING = """Welcome to NYCSamosa! SMS for City info or make a 311 complaint. Ask about events on any day "events tomorrow", about altparking suspension dates "altparking", or wifi,cafe,parking or laundry around any location "wifi near union square" or "parking at lexington & E 54th"
+HELP_STRING = """Welcome to nycSaMoSa! SMS for City info or make a 311 complaint. Ask about events on any day "events tomorrow", about altparking suspension dates "altparking", or wifi,cafe,parking or laundry around any location "wifi near union square" or "parking at lexington & E 54th"
 """
 CONFUSION = "I'm sorry, I didn't understand you.  Please try again or reply 'HELP' for more info."
 EVENTS_RSS='http://www.nycgovparks.org/xml/events_300_rss.xml'
