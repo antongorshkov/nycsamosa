@@ -23,7 +23,7 @@ def showmap2():
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
 <head>
-    <title>NYCSamosa</title>
+    <title>nycSaMoSa</title>
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=iso-8859-1" />
     <meta name="author" content="Jenna Smith" />
     <meta name="copyright"    content="Copyright 2006 growldesign" />    
@@ -42,7 +42,7 @@ def showmap2():
             <li><a href="http://nycsamosa.appspot.com/dashboard">dashboard</a></li>
             <li><a href="http://nycsamosa.appspot.com/static/sms.html#contact">contact</a></li>
         </ul>
-        <h1><a href="#">NYCSamosa</a></h1>
+        <h1><a href="#">nyc<b>S</b>a<b>M</b>o<b>S</b>a</a></h1>        
     </div></div>
     <div id="content">
         <div id="right">
