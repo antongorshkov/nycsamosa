@@ -42,6 +42,7 @@ class MailHandler(InboundMailHandler):
             attachment = ("hey!",db.Blob(self.goodDecode(pic)))
                                     
         plaintext = mail_message.bodies(content_type='text/plain')
+        txtmsg = ""
         for text in plaintext:
             txtmsg = ""
             txtmsg = text[1].decode()
