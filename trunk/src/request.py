@@ -33,6 +33,7 @@ HELP_STRING = """Welcome to NYCSamosa! SMS for City info or make a 311 complaint
 """
 CONFUSION = "I'm sorry, I didn't understand you.  Please try again or reply 'HELP' for more info."
 EVENTS_RSS='http://www.nycgovparks.org/xml/events_300_rss.xml'
+MORE_STRING='reply \'more\' for additional listings.'
 
 class RequestHandler(object):
     '''
@@ -315,6 +316,7 @@ class LocateRequest(GenericRequest):
             Res_HTML += "(%s) %s<br>" % (self.results_index+1,res.description())
             self.results_index+=1
         self.img_url = url
+        Res_HTML += MORE_STRING
         return Res_HTML
     
     def MailResults(self, more=None):        
@@ -390,8 +392,11 @@ class FeedbackRequest(GenericRequest):
         self.LogIt("About to submit Feedback!")
         feedback.put()
         
-    def WebResults(self, more=None):
+    def MailResults(self, more=None, line_break="\n"):
         return "Thank you for your feedback! You can visit http://nycsamosa.appspot.com/dashboard to see it.(loc:%s)" % self.place
+    
+    def WebResults(self, more=None):
+        return "Thank you for your feedback! You can visit our <a href=http://nycsamosa.appspot.com/dashboard target=\"_blank\">Dashboard</a> to see it.(loc:%s)" % self.place
 
 class EventRequest(GenericRequest):
     '''
