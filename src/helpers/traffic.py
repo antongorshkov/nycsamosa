@@ -32,16 +32,17 @@ class Traffic():
     def getUpdates(self):
         updates = []
         begin = 0
-        head1 = '&lt;p&gt;&lt;span class="blue"&gt;'
+        head1 = '&lt;p&gt;'
         #head1 = '<p><span class="blue">'
-        head2 = ':&lt;/span&gt;'
+        head2 = ':'
         #head2 = ':</span>'
         body2 = '&lt;/p&gt;'
         num = string.count(self.s,head1)
         for i in range(0,num):
             head,begin = self.betweenTags(self.s, begin, head1, head2)
-            body,begin = self.betweenTags(self.s, begin, head2+' ', body2)
-            updates.append([head,body])
+            if(head.find('ridlock') == -1):
+                body,begin = self.betweenTags(self.s, begin, head2+' ', body2)
+                updates.append([head,body])
         return updates
 
     def googleSet(self):
