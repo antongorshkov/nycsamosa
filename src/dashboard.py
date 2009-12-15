@@ -38,11 +38,13 @@ def showmap2():
     <div id="header"><div>
         <ul>
             <li><a href="http://nycsamosa.appspot.com/static/sms.html#demo" class="on">demo</a></li>
+            <li><a href="http://nycsamosa.appspot.com/static/sms.html#about">about</a></li>
             <li><a href="http://nycsamosa.appspot.com/static/sms.html#features">features</a></li>
             <li><a href="http://nycsamosa.appspot.com/dashboard">dashboard</a></li>
-            <li><a href="http://nycsamosa.appspot.com/static/sms.html#contact">contact</a></li>
+                        
         </ul>
-        <h1><a href="#">nyc<b>S</b>a<b>M</b>o<b>S</b>a</a></h1>        
+        <h1><a href="#about">nyc<b>S</b>a<b>M</b>o<b>S</b>a</a></h1>
+        <h3><a href=#about">&nbsp &nbsp &nbsp &nbsp &nbsp Interact with The City via SMS</a></h3>
     </div></div>
     <div id="content">
         <div id="right">
