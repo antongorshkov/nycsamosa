@@ -36,15 +36,17 @@ acronym { border-bottom: 1px dotted #cc0000; cursor: help; }
 	padding: 0;
 	}
 #header div { 
-	background: url(img/header_botm.jpg) no-repeat 0px 70px; 
+	background: url(img/header_botm.jpg) no-repeat 0px 65px; 
 	text-align: left;
-	padding: 45px 0 97px 20px;	
+	padding: 45px 0 65px 20px;	
 	}	
 #header h1 {
 	margin: 0; 
+	color: #000;
 	clear: both;
-	padding: 43px 0 0 40px;	
-	font-size: 4em;	
+	padding: 23px 0 0 20px;
+	font-weight: normal;	
+	font-size: 3em;	
 	}
 #header h1 a { 
 	padding: 0;
@@ -54,7 +56,7 @@ acronym { border-bottom: 1px dotted #cc0000; cursor: help; }
 	color: #000;	
 	}	
 #header h1 a:hover { background-color: transparent; }	
-* html #header h1 { padding-top: 23px; }	
+* html #header h1 { padding-top: 16px; }	
 
 /*------------------------------------------------------------*
 **  Navigation
@@ -121,8 +123,8 @@ acronym { border-bottom: 1px dotted #cc0000; cursor: help; }
 	}
 #content p {
 	text-indent: 0em;
-	line-height: 2em;
-	letter-spacing: 0.1em;	
+	line-height: 1.5em;
+	letter-spacing: 0em;	
 	}	
 	
 #content ul {
