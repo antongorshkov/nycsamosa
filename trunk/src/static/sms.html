@@ -9,6 +9,7 @@
 	<meta name="description" content="NYCSamosa entry for the NYC BigApps competition" />	
 	<meta http-equiv="imagetoolbar" content="no" />	
 	<meta http-equiv="Expires" content="Mon, 26 Jul 1997 05:00:00 GMT">
+
 	<meta http-equiv="Cache-Control" content="no-cache">
 	<meta http-equiv="Pragma" content="no-cache">	 
 	<link href="bc-stylesheet.css" rel="stylesheet" type="text/css" />
@@ -23,16 +24,17 @@
 			<li><a href="#features">features</a></li>
 			<li><a href="http://nycsamosa.appspot.com/dashboard">dashboard</a></li>
 		</ul>
-		<a href="#about"><h1>NYC <b>s</b>a<b>m</b>o<b>s</b>a</h1>
-		<h3>&nbsp &nbsp Interact with The City through SMS</h3></a>
+		<h1><a href="#about">nyc<b>S</b>a<b>M</b>o<b>S</b>a</a></h1>
+		<h3><a href=#about">&nbsp &nbsp &nbsp &nbsp &nbsp Interact with The City via SMS</a></h3>
 	</div></div>
 	<div id="content">
 		<div id="right">
 			<p><br><b>Where's the nearest wifi spot?  Any events scheduled for tomorrow?  Traffic updates en route?</b>  Get answers to these any 
-			many other questions by sending <a href="nycsamosa@gmail.com">SMS to nycsamosa@gmail.com</a> from any cellphone.  
-			<b>Check out this <em>quick</em> demo:</b> Type a request into the box and view the search results on the cell phone screen. 
-			For full range of currently available inquiries see <a href="#features">the list of features, below</a>.  
+			many other questions by sending SMS to <a href="mailto: nycsamosa@gmail.com">nycsamosa@gmail.com</a> from any cellphone.  
+			<b>Check out this quick demo:</b> Type a request into the box and view the search results on the cell phone screen. 
+			For full range of currently available inquiries see <a href="#features">the list of features</a>, below.  
 			</p>
+
 		
 <!--!!!!!!!!!!!!!! BEGIN OF SMS.HTML PASTE!!!!!!!!!!!!!!!!!! -->			
 				        <br>
@@ -49,6 +51,7 @@
 				 <input value="" name="searchTerm" id="searchTerm"  size="20" 
 				 onkeydown="if (event.keyCode == 13) return searchFor(searchTerm.value)"
 				 type="text">
+
 				  <input value="http://nycsamosa.appspot.com/websms?sms=" id="searchUrl" name="searchUrl" type="hidden">
 				  <input value="Send" type="submit"> <br><br>
 				</div>
@@ -58,6 +61,7 @@
 				            <th style="Zwidth: 150px;">Type or click on links to fill text<br><br></th>
 				          </tr>
 				          <tr>
+
 				            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('Broken tree @ 180 madison'); ">Broken tree @ 180 madison</a></td>
 				          </tr>
 				          <tr>
@@ -65,6 +69,7 @@
 				          </tr>
 				          <tr>
 				            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('events tomorrow'); ">events tomorrow</a></td>
+
 				          </tr>
 				          <tr>
 				            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('events on dec 10th'); ">events on dec 10th</a></td>
@@ -73,6 +78,7 @@
 				            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('events 12/14'); ">events 12/14</a></td>
 				          </tr>
 				          <tr>
+
 				            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('alternate'); ">alternate</a></td>
 				          </tr>
 				          <tr>
@@ -80,6 +86,7 @@
 				          </tr>
 				          <tr>
 				            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('wifi near union square'); ">wifi near union square</a></td>
+
 				          </tr>
 				          <tr>
 				            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('parking around lincoln center'); ">parking around lincoln center</a></td>
@@ -87,6 +94,7 @@
 				          <tr>
 				            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('parking at lexington & E 54th'); ">parking at lexington &amp; E 54th</a></td>
 				          </tr>
+
 				          <tr>
 				            <td style="Zwidth: 380px;"><a href="javascript:{}"  onclick="searchFor('cafe @ flatiron'); ">cafe @ flatiron</a></td>
 				          </tr>
@@ -95,6 +103,7 @@
 				          </tr>
 				          <tr>
 				            <td style="Zwidth: 380px;"><a href="javascript:{}" onclick="searchFor('help'); ">help</a></td>
+
 				          </tr>
 				          <tr>
 				          <tr>
@@ -103,6 +112,7 @@
 				          <tr>
 				            <td></td>
 				          </tr>
+
 				        </tbody>
 				      </table>
 				      </td>
@@ -112,6 +122,7 @@
 				 <div style="margin: 0pt auto; text-align: center;"> 
 				 <iframe src="http://nycsamosa.appspot.com/websms" style="margin: 0pt auto;" id="demoframe" name="demoframe" frameborder="0" height="400" width="600"></iframe>
 				 </div>
+
 				 </td></tr>
 				 	</table>
 				      <script type="text/javascript">
@@ -134,11 +145,12 @@
 <!--!!!!!!!!!!!!!! THE END OF SMS.HTML PASTE!!!!!!!!!!!!!!!!!! -->
 			<img src="zdivider.jpg" width=714>
 			<p><p>
-			<h2 id="about">About <em>NYC Samosa</em></h2>
+			<h2 id="about">About <em>nycSaMoSa</em></h2>
 			<p>This is a demo of an SMS-enabled Web Application, designed for users to take advantage of 
 			<a href="http://nyc.gov/data">New York City's Data Mine initiative</a>. With vast majority of people not having browser access on the go, we decided to design an 
 			SMS application that allows users submit 311 complaints and query several City Agency datasets without needing a computer or a fancy phone.
 			<p>The data is provided by the city and all sets are publicly available <a href="http://nyc.gov/data">here</a></p>
+
 			<p>One of the key efforts is to allow users to input natural phrases, without many restrictions by any special syntax. You still need to 
 			have correct order of elements, so it's not perfect yet, but getting there :)
 			</p>
@@ -150,6 +162,7 @@
 			<p>If you have suggestions, complaints, or just want to give us a pat on the back, email <a href="mailto: samosateam@gmail.com">samosateam@gmail.com</a>.</p>
 			<h2 id="features">Feature <em>List</em></h2>
 			<h1>Location-based Search</h1>
+
 			<blockquote><p>
 			Search for Cafes, Parking garages, Wifi hotspots or Laundromats. 
 			The search will return five closest hits, based on geographic location provided.
@@ -162,6 +175,7 @@
 			<b><em>events on Dec 15</em></b>.  
 			After getting back a set of results either reply <b><em>more</em></b> to see more listings or <b><em>more 5</em></b> to get details of listing #5 (for example).
 			</p>
+
 			  
 			</p></blockquote>
 			
@@ -172,6 +186,7 @@
 			
 			<h1>Traffic Updates</h1>
 			<blockquote><p>
+
 			Get Traffic Updates relevant to your route. This can be a good compliment to the instant updates on the radio.  This data is updated weekly and 
 			includes planned disruptions due to repair or temporary regulation change.  Simply text <b><em>traffic manhattan to brooklyn</em></b> 
 			or <b><em>traffic morristown, nj to 1 beard st, brooklyn</em></b> and get construction info along with other traffic-related information
@@ -186,6 +201,7 @@
 			and see it on the NYC map along with other complaints. 
 			(<b><em>broken tree @ park ave and 34th street</em></b>)
 			<br>
+
 			Currently Accepted complaint keywords: <b>tree, sign, light, lot, street, taxi, graffiti, broken, dirty, missing, unsafe, damaged</b>
 			</p></blockquote>
 		</div>	
@@ -193,6 +209,7 @@
 </div>
 <div id="footer"> 
 	<p>Copyright &copy; 2009 Anton Gorshkov & David Rytzarev. All Rights Reserved. | design by <a href="http://www.growldesign.co.uk">growldesign</a></p>
+
 </div>
 </body>
 </html>
