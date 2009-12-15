@@ -62,7 +62,8 @@ acronym { border-bottom: 1px dotted #cc0000; cursor: help; }
 	font-weight: normal;
 	color: #000;	
 	}	
-#header h1 a:hover { background-color: transparent; }	
+#header h1 a:hover { background-color: transparent; }
+#header h3 a:hover { background-color: transparent; }
 * html #header h1 { padding-top: 23px; }	
 
 /*------------------------------------------------------------*
