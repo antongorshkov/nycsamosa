@@ -124,7 +124,7 @@ acronym { border-bottom: 1px dotted #cc0000; cursor: help; }
 #content p {
 	text-indent: 0em;
 	line-height: 1.5em;
-	letter-spacing: 0.04em;	
+	letter-spacing: 0.1em;	
 	}	
 	
 #content ul {
