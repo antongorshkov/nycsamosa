@@ -32,10 +32,15 @@ class Traffic():
     def getUpdates(self):
         updates = []
         begin = 0
-        head1 = '&lt;p&gt;'
-        #head1 = '<p><span class="blue">'
-        head2 = ':'
-        #head2 = ':</span>'
+        #if we are using parser
+        #head1,head2 = '<p><span class="blue">' , ':</span>'
+
+        # if they are using <class>
+        head1, head2 = '&lt;p&gt;&lt;span class="blue"&gt;' , ':&lt;/span&gt;'        
+
+        # if they are NOT using <class>
+        #head1, head2 = '&lt;p&gt;' , ':'
+
         body2 = '&lt;/p&gt;'
         num = string.count(self.s,head1)
         for i in range(0,num):
