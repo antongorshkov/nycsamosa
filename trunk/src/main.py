@@ -32,7 +32,9 @@ class MailHandler(InboundMailHandler):
         logger.LogIt("Received a message from: " + mail_message.sender)
         ########################################################################  BEGIN Modified by Dima (adding try/except)
         try: logger.LogIt("Subject: " + mail_message.subject)
-        except: logger.LogIt("Subject: None")
+        except:
+            mail_message.subject = "Request" 
+            logger.LogIt("Subject: " + mail_message.subject)
         ########################################################################  END Modified by Dima        
         attachment = []
         pic = None
