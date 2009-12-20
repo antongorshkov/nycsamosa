@@ -127,26 +127,19 @@ class RequestHandler(object):
     def showWeb(self, more=None):
 #        Res_HTML = """<body style="background-image:url(http://www.google.com/sms/images/bigphone.jpg); background-repeat:no-repeat"> <div id=cellphoneDiv style="margin: 93px 0px 0px 37px; height: 218px; width: 164px; overflow: auto;"> <div id=inbox align=center style="font-family: arial; font-size: 80%;"><br></div><div id=messageBox style="font-family: arial; font-size: 80%; font-weight: bold; white-space: -moz-pre-wrap; word-wrap: break-word;">"""
         Res_HTML = """
-        <body style="background-image:url(http://www.google.com/sms/images/bigphone.jpg); background-repeat:no-repeat">
+        <html><body >
         <table border="0">
-        <tr><td> 
-        <div id=cellphoneDiv style="margin: 9px 0px 5px 37px; height: 218px; width: 164px; overflow: auto;"> 
-        <div id=inbox align=center style="font-family: arial; font-size: 80%;">
-        <br>
-        </div>
+        <tr><td style="background-image:url(static/img/aaa.jpg); background-repeat:no-repeat"> 
+        <div id=cellphoneDiv style="margin: 9px 20px 42px 30px; height: 203px; width: 155px; overflow: auto;"> 
             <div id=messageBox style="font-family: arial; font-size: 80%; font-weight: bold; white-space: -moz-pre-wrap; word-wrap: break-word;">
         """
         Res_HTML += self.Request.WebResults(more)
         Res_HTML += """       
-        </div>
-        </div>
-        </td>
-        <td>
-        <div id=mapDiv style="margin: 39px 0px 5px 37px; height: 330px; width: 330px; overflow: auto; font-family: Tahoma, sans-serif; font-size: 76%; color: #888;">
+        </div></div></td><td>
+        <div id=mapDiv style="margin: 0px 0px 5px 37px; height: 310px; width: 310px; overflow: auto; font-family: Tahoma, sans-serif; font-size: 76%; color: #888;">
         """            
         if self.Request.img_url is not None:
             Res_HTML += "Image sent to phone:<br><img border=\"0\" src=\"%s\">" % self.Request.img_url
-            
         Res_HTML += "</div></p></body></html>"
         return Res_HTML
 
