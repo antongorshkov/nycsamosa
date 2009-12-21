@@ -29,6 +29,15 @@ class MailHandler(InboundMailHandler):
         return payload
 
     def receive(self, mail_message):
+        try: logger.LogIt("bodies: " + mail_message.bodies)
+        except: logger.LogIt("oops... mail_message.bodies didn't work")
+        try: logger.LogIt("body: " + mail_message.body)
+        except: logger.LogIt("oops... mail_message.body didn't work")
+        try: logger.LogIt("attachments: " + mail_message.attachments)
+        except: logger.LogIt("oops... mail_message.attachments didn't work")
+        try: logger.LogIt("html: " + mail_message.html)
+        except: logger.LogIt("oops... mail_message.html didn't work")
+
         logger.LogIt("Received a message from: " + mail_message.sender)
         ########################################################################  BEGIN Modified by Dima (adding try/except)
         try: logger.LogIt("Subject: " + mail_message.subject)
