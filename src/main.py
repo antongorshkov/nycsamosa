@@ -29,22 +29,12 @@ class MailHandler(InboundMailHandler):
         return payload
 
     def receive(self, mail_message):
-        try: logger.LogIt("bodies: " + mail_message.bodies)
-        except: logger.LogIt("oops... mail_message.bodies didn't work")
-        try: logger.LogIt("body: " + mail_message.body)
-        except: logger.LogIt("oops... mail_message.body didn't work")
-        try: logger.LogIt("attachments: " + mail_message.attachments)
-        except: logger.LogIt("oops... mail_message.attachments didn't work")
-        try: logger.LogIt("html: " + mail_message.html)
-        except: logger.LogIt("oops... mail_message.html didn't work")
-
-        logger.LogIt("Received a message from: " + mail_message.sender)
-        ########################################################################  BEGIN Modified by Dima (adding try/except)
+        logger.LogIt("Received a message from: " + mail_message.sender)            
         try: logger.LogIt("Subject: " + mail_message.subject)
         except:
             mail_message.subject = "Request" 
             logger.LogIt("Subject: " + mail_message.subject)
-        ########################################################################  END Modified by Dima        
+
         attachment = []
         pic = None
         logger.LogIt( str(mail_message.bodies))
@@ -61,6 +51,17 @@ class MailHandler(InboundMailHandler):
             txtmsg = ""
             txtmsg = text[1].decode()
         txtmsg = txtmsg.split("\n")[0]
+        
+        #########################TMOBILE HANDLER########################
+        TmobilRegEx = re.compile("tmomail")
+        if TmobilRegEx.search(mail_message.sender) is not None:
+            attachments = mail_message.attachments
+            for a in attachments:
+                (file_name,content)=a
+                if file_name == "text_0.txt":
+                    txtmsg = content.payload
+        #########################TMOBILE HANDLER######################## 
+        
         logger.LogIt("Body is %s" % txtmsg)
         logger.LogIt("Length of body is: " + str(len(txtmsg)))
         m = memcache.Client()
