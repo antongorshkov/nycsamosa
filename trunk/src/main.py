@@ -58,7 +58,7 @@ class MailHandler(InboundMailHandler):
             attachments = mail_message.attachments
             for a in attachments:
                 (file_name,content)=a
-                if file_name == "text_0.txt":
+                if ".txt" in file_name:
                     txtmsg = content.payload
         #########################TMOBILE HANDLER######################## 
         
