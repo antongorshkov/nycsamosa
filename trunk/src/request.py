@@ -439,7 +439,7 @@ class EventRequest(GenericRequest):
             dt = date.today()
             dt = datetime(dt.year, dt.month, dt.day)
 ######################### D I M A   A D D E D            
-        elif date(dt.year,dt.month,dt.day) < date.today():
+        elif dt.year >= date.today().year and date(dt.year,dt.month,dt.day) < date.today():
             if (dt.year%4 == 0 and dt.month<3) or ((dt.year+1)%4 == 0 and dt.month>2):
                 dt += timedelta(366)
             else:
