@@ -443,7 +443,7 @@ class EventRequest(GenericRequest):
         self.LogIt("Looking for events on %s" % dt)
         ret_results = []
         for e in d.entries:
-            event_date = parse(e.startdate)
+            event_date = parse(e.event_startdate)
             if event_date == dt:
                 ret_results.append( e )
         
