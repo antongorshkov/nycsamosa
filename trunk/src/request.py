@@ -14,7 +14,7 @@ from google.appengine.api import mail
 from urllib2 import urlopen
 from models.models import * #@UnusedWildImport google wants it!
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from dateutil.relativedelta import *
 from dateutil.parser import *
 from feedparser import feedparser
@@ -438,6 +438,13 @@ class EventRequest(GenericRequest):
         if dt is None:
             dt = date.today()
             dt = datetime(dt.year, dt.month, dt.day)
+######################### D I M A   A D D E D            
+        elif date(dt.year,dt.month,dt.day) < date.today():
+            if (dt.year%4 == 0 and dt.month<3) or ((dt.year+1)%4 == 0 and dt.month>2):
+                dt += timedelta(366)
+            else:
+                dt += timedelta(365)
+##################### E N D   D I M A   A D D E D            
         self.event_date = dt    
         d = feedparser.parse(EVENTS_RSS)
         self.LogIt("Looking for events on %s" % dt)
